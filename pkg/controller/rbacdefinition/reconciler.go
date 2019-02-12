@@ -42,14 +42,14 @@ func (r *Reconciler) ReconcileNamespaceChange(rbacDef *rbacmanagerv1beta1.RBACDe
 		ownerRefs: r.ownerRefs,
 	}
 
-	if p.hasNamespaceSelectors(rbacDef) {
-		logrus.Infof("Reconciling %v namespace for %v", namespace.Name, rbacDef.Name)
-		p.parseRoleBindings(rbacDef)
-		err := r.reconcileRoleBindings(&p.parsedRoleBindings)
-		if err != nil {
-			return err
-		}
+	//if p.hasNamespaceSelectors(rbacDef) {
+	logrus.Infof("Reconciling %v namespace for %v", namespace.Name, rbacDef.Name)
+	p.parseRoleBindings(rbacDef)
+	err := r.reconcileRoleBindings(&p.parsedRoleBindings)
+	if err != nil {
+		return err
 	}
+	//}
 
 	return nil
 }

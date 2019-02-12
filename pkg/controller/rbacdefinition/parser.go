@@ -152,6 +152,53 @@ func (p *Parser) parseRoleBinding(
 			})
 		}
 
+	} else if rb.NamespaceWhiteList != nil {
+		logrus.Debugf("Processing Namespace White List %v", rb.NamespaceWhiteList)
+
+		namespaces, err := p.Clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+
+		for _, namespace := range namespaces.Items {
+			if contains(rb.NamespaceWhiteList, namespace.Name) {
+
+				logrus.Debugf("Adding Role Binding With Dynamic Namespace %v", namespace.Name)
+
+				om := objectMeta
+				om.Namespace = namespace.Name
+
+				p.parsedRoleBindings = append(p.parsedRoleBindings, rbacv1.RoleBinding{
+					ObjectMeta: om,
+					RoleRef:    roleRef,
+					Subjects:   subjects,
+				})
+			}
+		}
+
+	} else if rb.NamespaceBlackList != nil {
+		logrus.Debugf("Processing Namespace Black List %v", rb.NamespaceBlackList)
+
+		namespaces, err := p.Clientset.CoreV1().Namespaces().List(metav1.ListOptions{})
+		if err != nil {
+			return err
+		}
+
+		for _, namespace := range namespaces.Items {
+			if !contains(rb.NamespaceBlackList, namespace.Name) {
+
+				logrus.Debugf("Adding Role Binding With Dynamic Namespace %v", namespace.Name)
+
+				om := objectMeta
+				om.Namespace = namespace.Name
+
+				p.parsedRoleBindings = append(p.parsedRoleBindings, rbacv1.RoleBinding{
+					ObjectMeta: om,
+					RoleRef:    roleRef,
+					Subjects:   subjects,
+				})
+			}
+		}
 	} else if rb.Namespace != "" {
 		objectMeta.Namespace = rb.Namespace
 
@@ -166,6 +213,15 @@ func (p *Parser) parseRoleBinding(
 	}
 
 	return nil
+}
+
+func contains(list []string, s string) bool {
+	for _, item := range list {
+		if item == s {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *Parser) hasNamespaceSelectors(rbacDef *rbacmanagerv1beta1.RBACDefinition) bool {

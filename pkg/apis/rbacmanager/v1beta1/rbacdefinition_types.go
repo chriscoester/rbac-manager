@@ -36,10 +36,12 @@ type ClusterRoleBinding struct {
 
 // RoleBinding is a specification for a RoleBinding resource
 type RoleBinding struct {
-	ClusterRole       string               `json:"clusterRole,omitempty"`
-	Role              string               `json:"role,omitempty"`
-	Namespace         string               `json:"namespace,omitempty"`
-	NamespaceSelector metav1.LabelSelector `json:"namespaceSelector,omitempty"`
+	ClusterRole        string               `json:"clusterRole,omitempty"`
+	Role               string               `json:"role,omitempty"`
+	Namespace          string               `json:"namespace,omitempty"`
+	NamespaceSelector  metav1.LabelSelector `json:"namespaceSelector,omitempty"`
+	NamespaceWhiteList []string             `json:"namespaceWhiteList,omitempty"`
+	NamespaceBlackList []string             `json:"namespaceBlackList,omitempty"`
 }
 
 // +genclient
